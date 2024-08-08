@@ -3,6 +3,7 @@ import { http } from '@api/axios.interceptor';
 export async function get() {
   return await http(`/ticket`, {
     method: 'GET',
+    params: { perPage: 1000 },
   });
 }
 

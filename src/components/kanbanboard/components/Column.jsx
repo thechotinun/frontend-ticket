@@ -30,7 +30,7 @@ const Column = ({ column, columnId }) => {
   return (
     <>
       <h2>{column.title}</h2>
-      <div style={{ margin: 8 }}>
+      <div style={{ margin: 8, overflowX: 'auto', height: '500px' }}>
         <Droppable droppableId={columnId} key={columnId}>
           {(provided, snapshot) => (
             <div

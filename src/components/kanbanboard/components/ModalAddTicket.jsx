@@ -4,7 +4,7 @@ import { create } from '@api/ticket.api';
 
 const { TextArea } = Input;
 
-const ModalAddTicket = ({ isModalOpen, setIsModalOpen }) => {
+const ModalAddTicket = ({ isModalOpen, setIsModalOpen, fetchTickets }) => {
   const [formAddTicket] = Form.useForm();
   const [loadingSkeleton] = useState(false);
 
@@ -18,6 +18,7 @@ const ModalAddTicket = ({ isModalOpen, setIsModalOpen }) => {
       await create(values);
       formAddTicket.resetFields();
       setIsModalOpen(!isModalOpen);
+      await fetchTickets();
     } catch (error) {
       console.log(error);
     }

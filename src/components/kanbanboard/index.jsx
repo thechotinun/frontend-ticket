@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { map } from 'lodash';
+import { map, groupBy, mapValues } from 'lodash';
 import { Button } from 'antd';
 import initialData from './data';
 import Column from './components/Column';
@@ -8,14 +8,25 @@ import ModalAddTicket from './components/ModalAddTicket';
 import { get as getTickets } from '@api/ticket.api';
 
 const KanbanBoard = () => {
-  const [columns, setColumns] = useState(initialData);
+  const [columns, setColumns] = useState();
   const [isModalAddTicketOpen, setIsModalAddTicketOpen] = useState(false);
-  const [data, setData] = useState();
 
   const fetchTickets = async () => {
     try {
       const { data } = await getTickets();
-      setData(data.data)
+      // Group tasks by status
+      const groupedTasks = groupBy(data.data, 'status');
+
+      // Create new columns object with tasks
+      const newColumns = mapValues(initialData, (column, key) => ({
+        ...column,
+        tasks: map(groupedTasks[key] || [], (task) => ({
+          id: `task-${task.id}`,
+          content: task.title,
+          status: task.status,
+        })),
+      }));
+      setColumns(newColumns);
     } catch (error) {
       console.error('Error fetching tickets:', error);
     }
@@ -24,7 +35,7 @@ const KanbanBoard = () => {
   useEffect(() => {
     fetchTickets();
   }, []);
-  
+
   const onDragEnd = (result) => {
     const { source, destination } = result;
 
@@ -89,22 +100,27 @@ const KanbanBoard = () => {
         </Button>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', height: '100%' }}>
-        <DragDropContext onDragEnd={onDragEnd}>
-          {map(columns, (column, columnId) => (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-              key={columnId}
-            >
-              <Column column={column} columnId={columnId} />
-            </div>
-          ))}
+        <DragDropContext onDragEnd={onDragEnd} withScrollableColumns>
+          {columns &&
+            map(columns, (column, columnId) => (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+                key={columnId}
+              >
+                <Column column={column} columnId={columnId} />
+              </div>
+            ))}
         </DragDropContext>
       </div>
-      <ModalAddTicket isModalOpen={isModalAddTicketOpen} setIsModalOpen={setIsModalAddTicketOpen} />
+      <ModalAddTicket
+        isModalOpen={isModalAddTicketOpen}
+        setIsModalOpen={setIsModalAddTicketOpen}
+        fetchTickets={fetchTickets}
+      />
     </div>
   );
 };
