@@ -13,3 +13,10 @@ export async function create(reqBody) {
     data: reqBody,
   });
 }
+
+export async function update(id, reqBody) {
+  return await http(`/ticket/${id}`, {
+    method: 'PATCH',
+    data: reqBody,
+  });
+}

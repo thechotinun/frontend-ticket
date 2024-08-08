@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { map, groupBy, mapValues } from 'lodash';
+import { groupBy, mapValues, map, orderBy } from 'lodash';
+import moment from 'moment';
 import { Button } from 'antd';
 import initialData from './data';
 import Column from './components/Column';
 import ModalAddTicket from './components/ModalAddTicket';
-import { get as getTickets } from '@api/ticket.api';
+import { get as getTickets, update as updateTicket } from '@api/ticket.api';
 
 const KanbanBoard = () => {
   const [columns, setColumns] = useState();
@@ -20,12 +21,19 @@ const KanbanBoard = () => {
       // Create new columns object with tasks
       const newColumns = mapValues(initialData, (column, key) => ({
         ...column,
-        tasks: map(groupedTasks[key] || [], (task) => ({
-          id: `task-${task.id}`,
-          content: task.title,
-          status: task.status,
-        })),
+        tasks: orderBy(
+          map(groupedTasks[key] || [], (task) => ({
+            id: `task-${task.id}`,
+            content: task.title,
+            status: task.status,
+            description: task.description,
+            updatedDate: task.updatedDate,
+          })),
+          [(task) => moment(task.updatedDate)],
+          ['desc']
+        ),
       }));
+
       setColumns(newColumns);
     } catch (error) {
       console.error('Error fetching tickets:', error);
@@ -36,8 +44,16 @@ const KanbanBoard = () => {
     fetchTickets();
   }, []);
 
+  const updateStatusTicket = async (id, reqBody) => {
+    try {
+      await updateTicket(id, reqBody);
+    } catch (error) {
+      console.error('Error update ticket:', error);
+    }
+  };
+
   const onDragEnd = (result) => {
-    const { source, destination } = result;
+    const { source, destination, draggableId } = result;
 
     if (!destination) return;
 
@@ -84,6 +100,12 @@ const KanbanBoard = () => {
         [source.droppableId]: newStart,
         [destination.droppableId]: newFinish,
       });
+
+      // Extract the actual ID from the draggableId
+      const ticketId = draggableId.split('-')[1];
+
+      // Call updateStatusTicket with the new status
+      updateStatusTicket(ticketId, { status: destination.droppableId });
     }
   };
 
@@ -91,7 +113,14 @@ const KanbanBoard = () => {
     <div>
       <div style={{ textAlign: 'left' }}>
         <Button
-          type="primary"
+          style={{
+            background: 'linear-gradient(-45deg, #941061 5%, #ff0077 88%)',
+            borderColor: '#ff0077',
+            color: '#fff',
+            fontSize: '1rem',
+            height: '40px',
+            fontWeight: 'bold'
+          }}
           onClick={() => {
             setIsModalAddTicketOpen(!isModalAddTicketOpen);
           }}

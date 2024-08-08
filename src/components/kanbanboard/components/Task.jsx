@@ -1,22 +1,45 @@
+import { Card, Typography, Tag } from 'antd';
+
+const { Text } = Typography;
+
+const getStatusColor = (status) => {
+  switch (status.toLowerCase()) {
+    case 'pending':
+      return 'orange';
+    case 'accepted':
+      return 'cyan';
+    case 'resolved':
+      return 'green';
+    case 'rejected':
+      return 'red';
+    default:
+      return 'default';
+  }
+};
+
 const Task = ({ item, provided, snapshot }) => {
   return (
-    <div
+    <Card
       ref={provided.innerRef}
       {...provided.draggableProps}
       {...provided.dragHandleProps}
+      size="small"
       style={{
-        userSelect: 'none',
-        padding: 16,
-        margin: '0 0 8px 0',
-        minHeight: '50px',
-        backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
-        color: 'white',
+        marginBottom: 8,
+        backgroundColor: snapshot.isDragging ? '#f0f0f0' : 'white',
         ...provided.draggableProps.style,
+        textAlign: 'left',
       }}
+      title={`${item.content}`}
     >
-      <div>{item.content}</div>
-      <div style={{ fontSize: '0.8em', marginTop: '8px' }}>Status: {item.status}</div>
-    </div>
+      {/* <Typography.Title level={5}>{item.content}</Typography.Title> */}
+      <Text type="secondary" style={{ fontSize: '0.9em', display: 'block', marginBottom: 4 }}>
+        description: {item.description || '-'}
+      </Text>
+      <div style={{textAlign:'end'}}>
+        <Tag color={getStatusColor(item.status)}>{item.status}</Tag>
+      </div>
+    </Card>
   );
 };
 
