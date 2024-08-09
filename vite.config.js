@@ -9,7 +9,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     // eslint-disable-next-line no-undef
-    port: parseInt(process.env.VITE_PORT) || 5173
+    port: parseInt(process.env.VITE_PORT) || 5173,
+    strictPort: true,
+    host: true,
+  },
+  preview: {
+    port: 3000,
+    strictPort: true,
   },
   resolve: {
     alias: {

@@ -2,22 +2,9 @@ import { Card, Typography, Tag } from 'antd';
 
 const { Text } = Typography;
 
-const getStatusColor = (status) => {
-  switch (status.toLowerCase()) {
-    case 'pending':
-      return 'orange';
-    case 'accepted':
-      return 'cyan';
-    case 'resolved':
-      return 'green';
-    case 'rejected':
-      return 'red';
-    default:
-      return 'default';
-  }
-};
 
-const Task = ({ item, provided, snapshot }) => {
+
+const Task = ({ item, provided, snapshot, getStatusColor }) => {
   return (
     <Card
       ref={provided.innerRef}

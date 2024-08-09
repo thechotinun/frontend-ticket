@@ -3,6 +3,21 @@ import { Droppable as ReactBeautifulDndDroppable, Draggable } from '@hello-pange
 import { map } from 'lodash';
 import Task from './Task';
 
+const getStatusColor = (status) => {
+  switch (status.toLowerCase()) {
+    case 'pending':
+      return 'orange';
+    case 'accepted':
+      return 'cyan';
+    case 'resolved':
+      return 'green';
+    case 'rejected':
+      return 'red';
+    default:
+      return 'default';
+  }
+};
+
 const Droppable = ({ children, ...props }) => {
   const [enabled, setEnabled] = useState(false);
 
@@ -29,7 +44,7 @@ const Column = ({ column, columnId }) => {
 
   return (
     <>
-      <h2>{column.title}</h2>
+      <h2 style={{color: `${getStatusColor(column.title)}`}}>{column.title}</h2>
       <div style={{ margin: 8, overflowX: 'auto', height: '500px' }}>
         <Droppable droppableId={columnId} key={columnId}>
           {(provided, snapshot) => (
@@ -45,7 +60,9 @@ const Column = ({ column, columnId }) => {
             >
               {map(column.tasks, (item, index) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>
-                  {(provided, snapshot) => <Task item={item} provided={provided} snapshot={snapshot} />}
+                  {(provided, snapshot) => (
+                    <Task item={item} provided={provided} snapshot={snapshot} getStatusColor={getStatusColor} />
+                  )}
                 </Draggable>
               ))}
               {provided.placeholder}
