@@ -53,15 +53,15 @@ services:
     container_name: db_nipa
     image: postgres:14.8-alpine
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: password
+      POSTGRES_USER: root               # Your database username
+      POSTGRES_PASSWORD: password       # Your database password
     ports:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U root"]
+      test: ["CMD-SHELL", "pg_isready -U root"]   # Your database username ${root}
       interval: 5s
       timeout: 5s
       retries: 5
