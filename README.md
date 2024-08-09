@@ -45,6 +45,7 @@ $ npm run dev
 $ npm run build
 $ npm run preview
 ```
+2. Open your browser and navigate to `http://localhost:3000` to see the application in action.
 ## docker-compose.yml
 ```yml
 services:
